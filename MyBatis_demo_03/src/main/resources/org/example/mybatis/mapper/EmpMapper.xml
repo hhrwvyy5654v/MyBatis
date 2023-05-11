@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mybatis.mapper.EmpMapper">
+    <!--
+        resultMap:设置自定义映射关系
+        id:唯一标识，不能重复
+        type:设置映射关系中的实体类型
+        子标签：
+            id:设置主键的映射的映射关系
+            result:设置普通字段的映射关系
+        属性：
+            property:设置映射关系中的属性名，必须是type属性所设置
+        -->
+    <resultMap id="empResultMap" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+    </resultMap>
+
+    <!--从数据表t_emp中获取所有员工的信息
+        List<Emp> getAllEmp();-->
+    <select id="getAllEmp" resultMap="empResultMap"> select * from t_emp </select>
+
+    <!--处理多对一映射关系方式一：级联属性赋值,将Emp和Dept两个表的字段映射到Emp对象的属性上-->
+    <resultMap id="empAndDeptResultMapOne" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <result property="dept.did" column="did"></result>
+        <result property="dept.deptName" column="dept_name"></result>
+    </resultMap>
+    <!--处理多对一映射关系方式二：association,将Emp对象中的dept属性映射到Dept对象上-->
+    <resultMap id="empAndDeptResultMapTwo" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <!--
+            association:处理多对一的映射关系
+            property:需要处理多对的映射关系的属性名
+            javaType:该属性的类型
+        -->
+        <association property="dept" javaType="Dept">
+            <id property="did" column="did"></id>
+            <result property="deptName" column="dept_name"></result>
+        </association>
+    </resultMap>
+
+    <!--Emp
+    getEmpAndDept(@Param("eid") Integer eid);-->
+    <select id="getEmpAndDept" resultMap="empAndDeptResultMapTwo"> select * from t_emp left join
+        t_dept on t_emp.did = t_dept.did where t_emp.eid = #{eid} </select>
+
+    <resultMap id="empAndDeptByStepResultMap" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <!--
+            select:设置分页查询的sql的唯一标识(namespace.SQLId或者mapper接口的全类名.方法名)
+            column:设置分布查询的条件
+            fetchType:当开了全局的延迟加载之后，可以通过此属性手动控制延迟加载的效果
+            fetchType="lazy|eager":lazy表示延迟加载，eager表示立即加载
+          -->
+        <association property="dept"
+            select="org.example.mybatis.mapper.DeptMapper.getEmpAndDeptByStepTwo"
+            column="did"
+            fetchType="eager"></association>
+    </resultMap>
+    <!--EmpgetEmpAndDeptByStepOne(@Param("eid")Integer
+    eid);
+        根据eid查询t_emp表中的记录,并使用resultMap进行结果映射
+    -->
+    <select id="getEmpAndDeptByStepOne" resultMap="empAndDeptByStepResultMap">select * from t_emp
+        where eid = #{eid}</select>
+    <!--查询t_emp表中的所有记录，并使用resultType指定结果类型为Emp类-->
+    <select id="getAllEmpOld" resultType="Emp">
+        <!--select
+        eid,emp_Name,age,sex,email,from t_emp--> select * from t_emp </select>
+    <!--List<Emp>getDeptAndEmpByStepTwo(@Param("did")
+    Integer did);
+    根据did查询t_emp表中的记录，并使用resultType指定结果类型为Emp类-->
+    <select id="getDeptAndEmpByStepTwo" resultType="Emp">select * from t_emp where did = #{did}</select>
+
+</mapper>

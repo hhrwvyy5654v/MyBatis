@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../config/ehcache.xsd">
+    <!--磁盘保存路径-->
+    <diskStore path="D:\Java_Workspace\Learning Projects\MyBatis\ehcache"/>
+
+    <!--默认缓存配置-->
+    <defaultCache>
+        maxElementsInMemory="1000"  <!--最大内存元素数-->
+        maxElementsOnDisk="10000000"    <!--最大磁盘元素数-->
+        eternal="false" <!--是否永久存储-->
+        overflowToDisk="true"   <!--是否溢出到磁盘-->
+        timeToIdleSeconds="120" <!--元素空闲时间-->
+        timeToLiveSeconds="120" <!--元素存活时间-->
+        diskExpiryThreadIntervalSeconds="120"   <!--磁盘过期线程间隔时间-->
+        memoryStoreEvictionPolicy="LRU"    <!--内存存储驱逐策略-->
+    </defaultCache>
+</ehcache>

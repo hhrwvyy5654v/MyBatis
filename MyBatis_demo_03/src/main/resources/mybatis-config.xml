@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <properties resource="jdbc.properties"/>
+    <!--设置MyBatis在处理数据库字段名和Java类属性名映射时的配置-->
+    <settings>
+        <!--开启下划线转驼峰的功能,例如emp_name:empName-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--开启延迟加载,在需要的时候才加载相关数据，提高了系统的性能-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+    </settings>
+
+    <!--指定了org.example.mybatis.pojo包下的所有类都可以使用默认的别名-->
+    <typeAliases>
+        <package name="org.example.mybatis.pojo"/>
+    </typeAliases>
+    <!--配置数据库连接和事务管理-->
+    <environments default="development">
+        <environment id="development">  <!--定义环境-->
+            <transactionManager type="JDBC"/> <!--指定事务管理器的类型为JDBC-->
+            <dataSource type="POOLED">  <!--指定数据源的类型为POOLED-->
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <package name="org.example.mybatis.mapper"/>
+    </mappers>
+</configuration>

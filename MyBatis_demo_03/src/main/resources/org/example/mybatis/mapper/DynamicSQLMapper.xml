@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mybatis.mapper.DynamicSQLMapper">
+    <!--向t_emp表中插入多条记录
+        int insertMoreByList(@Param("emps") List<Emp> emps);-->
+    <insert id="insertMoreByList">
+        insert into t_emp values
+        <!--使用了MyBatis的foreach标签，将emps中的每个Emp对象都转换成一条insert语句中的值列表，并用逗号分隔
+        foreach标签的collection属性指定了要遍历的集合，item属性指定了集合中每个元素的别名，separator属性指定了每个元素之间的分隔符
+        -->
+        <foreach collection="emps" item="emp" separator=",">
+            (null,#{emp.empName},#{emp.age},#{emp.sex},#{emp.email},null)
+        </foreach>
+    </insert>
+
+    <!--批量删除t_emp表中的数据
+        int deleteMoreByArray(@Parm("eids") Integer[] eids);-->
+    <delete id="deleteMoreByArray">
+        delete from t_emp where
+        <!--eids 是一个数组，表示要删除的数据的主键值;使用了 MyBatis 的 foreach 标签,
+            将数组中的每个元素都拼接成一个 SQL 语句的条件,最终实现批量删除的功能
+        -->
+        <foreach collection="eids" item="eid" separator="or">
+            eid=#{eid}
+        </foreach>
+        <!--使用in关键字实现，可能会有SQL注入的风险-->
+        <!--
+            delete from t_emp where eid in
+            <foreach collection="eids" item="eid" separator="," open="(" close=")">
+                #{eid}
+            </foreach>
+         -->
+    </delete>
+
+    <!--根据选择的条件查询员工信息
+        List<Emp> getEmpByChoose(Emp emp);-->
+    <select id="getEmpByChoose" resultType="Emp">
+        select * from t_emp
+    <!--使用choose-when-otherwise语句块，根据不同的条件选择不同的查询语句-->
+        <where>
+            <choose>
+                <when test="empName!=null and empName != '' ">
+                    emp_name=#{empName}
+                </when>
+                <when test="age!=null and age!=''">
+                    age=#{age}
+                </when>
+                <when test="sex!= null and sex !=''">
+                    sex=#{sex}
+                </when>
+                <when test="email!=null and email !=''">
+                    email=#{email}
+                </when>
+                <!--如果没有任何条件被选择，则默认查询部门ID为1的员工信息-->
+                <otherwise>
+                    did=1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <sql id="empColumns">eid,emp_name,age,sex,email</sql>
+
+    <!--List<Emp> getEmpByCondition(Emp emp);-->
+    <select id="getEmpByCondition" resultType="Emp">
+        select <include refid="empColums"></include> from t_emp
+        <trim prefix="where" suffixOverrides="and|or">
+            <if test="empName != null and empName!= '' ">
+                emp_name=#{empName} and
+            </if>
+            <if test="age != null and age!=''">
+                age=#{age} and
+            </if>
+            <if test="sex != null and sex != ''">
+                sex=#{sex} and
+            </if>
+            <if test="email != null and email !=''">
+                email=# {email}
+            </if>
+        </trim>
+    </select>
+
+    <select id="getEmpByConditionTwo" resultType="Emp">
+        select * from t_emp
+        <where>
+            <if test="empName != null and empName!=''">
+                emp_name=#{empname}
+            </if>
+            <if test="age !=null and age!=''">
+                and age=#{age}
+            </if>
+            <if test="sex !=null and sex !=''">
+                or sex=#{sex}
+            </if>
+        </where>
+    </select>
+    <select id="getEmpByConditionOne" resultType="Emp">
+        select * from t_emp where 1=1
+        <if test="empName != null amd empName != ''">
+            emp_name=#{empName}
+        </if>
+        <if test="age !=null and age!=''">
+            and age =#{age}
+        </if>
+        <if test="sex != null and sex=''">
+            and sex=#{sex}
+        </if>
+        <if test="email != null and email !=''">
+            and email=#{email}
+        </if>
+    </select>
+</mapper>
