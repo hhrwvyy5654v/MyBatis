@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <!--log4j的配置文件中的一个appender，用于将日志输出到控制台-->
+    <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+        <param name="Encoding" value="UTF-8"></param>   <!--设置编码-->
+        <layout class="org.apache.log4j.PatternLayout"> <!--格式化日志输出的内容，包括日志等级、时间、消息、以及日志所在的类和行号-->
+            <param name="ConversionPattern" value="%-5p %d{MM-dd HH:mm:ss,SSS}%m  (%F:%L) \n" />
+        </layout>
+    </appender>
+    <!--配置日志等级为debug,应用程序运行时记录debug级别的日志-->
+    <logger name="java.sql">
+        <level value="debug" />
+    </logger>
+    <!--配置日志等级为info,应用程序运行时记录info级别的日志-->
+    <logger name="org.apache.ibatis">
+        <level value="info" />
+    </logger>
+    <!--设置日志输出的级别为bug和将日志输出到控制台-->
+    <root>
+        <level value="debug"></level>
+        <appender-ref ref="STDOUT" />
+    </root>
+</log4j:configuration>
